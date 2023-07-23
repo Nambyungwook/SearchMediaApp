@@ -1,15 +1,19 @@
-package com.nbw.searchmediaapp
+package com.nbw.searchmediaapp.ui.view
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.lifecycle.ViewModelProvider
+import com.nbw.searchmediaapp.R
+import com.nbw.searchmediaapp.data.repository.MediaRepositoryImpl
 import com.nbw.searchmediaapp.databinding.ActivityMainBinding
-import com.nbw.searchmediaapp.ui.view.FavoriteMediaFragment
-import com.nbw.searchmediaapp.ui.view.SearchMediaFragment
-import com.nbw.searchmediaapp.ui.view.SettingFragment
+import com.nbw.searchmediaapp.ui.viewmodel.MediaViewModel
+import com.nbw.searchmediaapp.ui.viewmodel.MediaViewModelProviderFactory
 
 class MainActivity : AppCompatActivity() {
 
     private val binding: ActivityMainBinding by lazy { ActivityMainBinding.inflate(layoutInflater) }
+
+    lateinit var mediaViewModel: MediaViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -19,6 +23,10 @@ class MainActivity : AppCompatActivity() {
         if (savedInstanceState == null) {
             binding.bottomNavigationView.selectedItemId = R.id.fragment_search_media
         }
+
+        val mediaRepository = MediaRepositoryImpl()
+        val viewModelFactory = MediaViewModelProviderFactory(mediaRepository)
+        mediaViewModel = ViewModelProvider(this, viewModelFactory)[MediaViewModel::class.java]
     }
 
     private fun setupBottomNavigationView() {

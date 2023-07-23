@@ -1,0 +1,9 @@
+package com.nbw.searchmediaapp.utils
+
+import com.nbw.searchmediaapp.BuildConfig
+
+object Constants {
+    const val BASE_URL = "https://dapi.kakao.com/"
+
+    const val API_KEY = BuildConfig.apiKey
+}
