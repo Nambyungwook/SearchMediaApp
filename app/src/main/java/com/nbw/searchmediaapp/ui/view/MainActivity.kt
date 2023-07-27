@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         val mediaRepository = MediaRepositoryImpl()
-        val viewModelFactory = MediaViewModelProviderFactory(mediaRepository)
+        val viewModelFactory = MediaViewModelProviderFactory(mediaRepository, this)
         mediaViewModel = ViewModelProvider(this, viewModelFactory)[MediaViewModel::class.java]
     }
 

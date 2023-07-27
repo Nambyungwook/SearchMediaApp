@@ -6,4 +6,6 @@ object Constants {
     const val BASE_URL = "https://dapi.kakao.com/"
 
     const val API_KEY = BuildConfig.apiKey
+
+    const val SEARCH_TIME_DELAY = 100L
 }

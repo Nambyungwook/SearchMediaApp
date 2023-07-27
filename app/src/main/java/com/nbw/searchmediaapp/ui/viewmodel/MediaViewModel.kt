@@ -2,6 +2,7 @@ package com.nbw.searchmediaapp.ui.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nbw.searchmediaapp.data.model.ImagesResponse
@@ -11,8 +12,23 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class MediaViewModel(
-    private val mediaRepository: MediaRepository
+    private val mediaRepository: MediaRepository,
+    private val savedStateHandle: SavedStateHandle
 ): ViewModel() {
+
+    companion object {
+        private const val SAVE_STATE_KEY = "query"
+    }
+
+    var query = String()
+        set(value) {
+            field = value
+            savedStateHandle.set(SAVE_STATE_KEY, value)
+        }
+
+    init {
+        query = savedStateHandle.get<String>(SAVE_STATE_KEY) ?: ""
+    }
 
     private val _searchMediaResult = MutableLiveData<ImagesResponse>()
     val searchMediaResult: LiveData<ImagesResponse> get() = _searchMediaResult
@@ -36,4 +52,6 @@ class MediaViewModel(
             }
         }
     }
+
+
 }
