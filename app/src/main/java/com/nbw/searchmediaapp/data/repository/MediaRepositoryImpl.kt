@@ -2,7 +2,9 @@ package com.nbw.searchmediaapp.data.repository
 
 import com.nbw.searchmediaapp.data.api.RetrofitInstance.api
 import com.nbw.searchmediaapp.data.model.ImagesResponse
-import retrofit2.Response
+import com.nbw.searchmediaapp.data.model.ResultWrapper
+import com.nbw.searchmediaapp.utils.safeApiCall
+import kotlinx.coroutines.Dispatchers
 
 class MediaRepositoryImpl: MediaRepository {
     override suspend fun searchImages(
@@ -10,12 +12,14 @@ class MediaRepositoryImpl: MediaRepository {
         sort: String,
         page: Int,
         size: Int
-    ): Response<ImagesResponse> {
-        return api.searchImages(
-            query,
-            sort,
-            page,
-            size
-        )
+    ): ResultWrapper<ImagesResponse> {
+        return safeApiCall(Dispatchers.IO) {
+            api.searchImages(
+                query,
+                sort,
+                page,
+                size
+            )
+        }
     }
 }

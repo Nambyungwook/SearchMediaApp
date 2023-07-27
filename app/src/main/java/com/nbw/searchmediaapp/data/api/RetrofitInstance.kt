@@ -10,15 +10,13 @@ object RetrofitInstance {
     private val okHttpClient: OkHttpClient by lazy {
         val httpLoggingInterceptor = HttpLoggingInterceptor()
             .setLevel(HttpLoggingInterceptor.Level.BODY)
-
-        val unBoxingInterceptor = UnBoxingInterceptor()
-
-        val addHeaderInterceptor = AddHeaderInterceptor()
+        val httpExceptionInterceptor = HttpExceptionInterceptor()
+        val headerInterceptor = HeaderInterceptor()
 
         OkHttpClient.Builder()
+            .addInterceptor(httpExceptionInterceptor)
             .addInterceptor(httpLoggingInterceptor)
-            .addInterceptor(unBoxingInterceptor)
-            .addInterceptor(addHeaderInterceptor)
+            .addInterceptor(headerInterceptor)
             .build()
     }
 

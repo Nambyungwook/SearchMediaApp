@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nbw.searchmediaapp.data.model.ImagesResponse
+import com.nbw.searchmediaapp.data.model.ResultWrapper
 import com.nbw.searchmediaapp.data.repository.MediaRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -16,11 +17,22 @@ class MediaViewModel(
     private val _searchMediaResult = MutableLiveData<ImagesResponse>()
     val searchMediaResult: LiveData<ImagesResponse> get() = _searchMediaResult
 
+    private val _errorMessage = MutableLiveData<String>()
+    val errorMessage: LiveData<String> get() = _errorMessage
+
     fun searchImages(query: String) = viewModelScope.launch(Dispatchers.IO) {
         val response = mediaRepository.searchImages(query, "accuracy", 1, 15)
-        if (response.isSuccessful) {
-            response.body()?.let { body ->
-                _searchMediaResult.postValue(body)
+
+        when (response) {
+            is ResultWrapper.Success -> {
+                _searchMediaResult.postValue(response.value)
+            }
+            is ResultWrapper.Error -> {
+                if (response.code == null) {
+                    _errorMessage.postValue("error type : ${response.errorType}  error message : ${response.errorMessage}")
+                } else {
+                    _errorMessage.postValue("http code : ${response.code}  error type : ${response.errorType}  error message : ${response.errorMessage}")
+                }
             }
         }
     }
