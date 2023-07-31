@@ -4,6 +4,7 @@ import com.nbw.searchmediaapp.utils.Constants.BASE_URL
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 
 object RetrofitInstance {
@@ -28,7 +29,20 @@ object RetrofitInstance {
             .build()
     }
 
+    private val rxRetrofit: Retrofit by lazy {
+        Retrofit.Builder()
+            .addConverterFactory(MoshiConverterFactory.create())
+            .client(okHttpClient)
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+            .baseUrl(BASE_URL)
+            .build()
+    }
+
     val api: SearchApi by lazy {
         retrofit.create(SearchApi::class.java)
+    }
+
+    val rxApi: RxSearchApi by lazy {
+        rxRetrofit.create(RxSearchApi::class.java)
     }
 }

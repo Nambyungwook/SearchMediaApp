@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -35,11 +36,16 @@ class SearchMediaFragment : Fragment() {
         mediaViewModel = (activity as MainActivity).mediaViewModel
 
         initRecyclerView()
-        search()
+//        search()
+        rxSearch()
 
         mediaViewModel.searchMediaResult.observe(viewLifecycleOwner) { result ->
             val medias = result.images
             mediaAdapter.submitList(medias)
+        }
+
+        mediaViewModel.errorMessage.observe(viewLifecycleOwner) { errorMessage ->
+            Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -55,6 +61,7 @@ class SearchMediaFragment : Fragment() {
         }
     }
 
+    // Coroutine을 사용한 검색
     private fun search() {
         val startTime = System.currentTimeMillis()
         var endTime: Long
@@ -69,6 +76,29 @@ class SearchMediaFragment : Fragment() {
                     val query = it.toString().trim()
                     if (query.isNotEmpty()) {
                         mediaViewModel.searchImages(query)
+                        mediaViewModel.rxSearchImages(query)
+                        mediaViewModel.query = query
+                    }
+                }
+            }
+        }
+    }
+
+    // Rx를 사용한 검색
+    private fun rxSearch() {
+        val startTime = System.currentTimeMillis()
+        var endTime: Long
+
+        binding.etSearch.text =
+            Editable.Factory.getInstance().newEditable(mediaViewModel.query)
+
+        binding.etSearch.addTextChangedListener { text: Editable? ->
+            endTime = System.currentTimeMillis()
+            if (endTime - startTime >= SEARCH_TIME_DELAY) {
+                text?.let {
+                    val query = it.toString().trim()
+                    if (query.isNotEmpty()) {
+                        mediaViewModel.rxSearchImages(query)
                         mediaViewModel.query = query
                     }
                 }
@@ -78,6 +108,7 @@ class SearchMediaFragment : Fragment() {
 
     override fun onDestroyView() {
         _binding = null
+        mediaViewModel.clearDisposables()
         super.onDestroyView()
     }
 }

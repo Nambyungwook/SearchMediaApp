@@ -1,9 +1,11 @@
 package com.nbw.searchmediaapp.data.repository
 
 import com.nbw.searchmediaapp.data.api.RetrofitInstance.api
+import com.nbw.searchmediaapp.data.api.RetrofitInstance.rxApi
 import com.nbw.searchmediaapp.data.model.ImagesResponse
 import com.nbw.searchmediaapp.data.model.ResultWrapper
 import com.nbw.searchmediaapp.utils.safeApiCall
+import io.reactivex.Observable
 import kotlinx.coroutines.Dispatchers
 
 class MediaRepositoryImpl: MediaRepository {
@@ -21,5 +23,19 @@ class MediaRepositoryImpl: MediaRepository {
                 size
             )
         }
+    }
+
+    override fun rxSearchImages(
+        query: String,
+        sort: String,
+        page: Int,
+        size: Int
+    ): Observable<ImagesResponse> {
+        return rxApi.rxSearchImages(
+            query,
+            sort,
+            page,
+            size
+        )
     }
 }
