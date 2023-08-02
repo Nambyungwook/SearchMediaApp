@@ -3,6 +3,9 @@ package com.nbw.searchmediaapp.ui.view
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
 import com.nbw.searchmediaapp.R
 import com.nbw.searchmediaapp.data.repository.MediaRepositoryImpl
 import com.nbw.searchmediaapp.databinding.ActivityMainBinding
@@ -13,16 +16,15 @@ class MainActivity : AppCompatActivity() {
 
     private val binding: ActivityMainBinding by lazy { ActivityMainBinding.inflate(layoutInflater) }
 
+    private lateinit var navController: NavController
+
     lateinit var mediaViewModel: MediaViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
         setupBottomNavigationView()
-
-        if (savedInstanceState == null) {
-            binding.bottomNavigationView.selectedItemId = R.id.fragment_search_media
-        }
 
         val mediaRepository = MediaRepositoryImpl()
         val viewModelFactory = MediaViewModelProviderFactory(mediaRepository, this)
@@ -30,28 +32,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupBottomNavigationView() {
-        binding.bottomNavigationView.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.fragment_search_media -> {
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.frame_layout, SearchMediaFragment())
-                        .commit()
-                    true
-                }
-                R.id.fragment_favorite_media -> {
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.frame_layout, FavoriteMediaFragment())
-                        .commit()
-                    true
-                }
-                R.id.fragment_setting -> {
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.frame_layout, SettingFragment())
-                        .commit()
-                    true
-                }
-                else -> false
-            }
-        }
+        val host = supportFragmentManager
+            .findFragmentById(R.id.nav_host_fragment) as NavHostFragment? ?: return
+        navController = host.navController
+        binding.bottomNavigationView.setupWithNavController(navController)
     }
 }

@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.nbw.searchmediaapp.databinding.FragmentSearchMediaBinding
@@ -58,6 +59,10 @@ class SearchMediaFragment : Fragment() {
                 DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL)
             )
             adapter = mediaAdapter
+        }
+        mediaAdapter.setOnItemClickListener { currentMedia ->
+            val action = SearchMediaFragmentDirections.actionFragmentSearchToMedia(currentMedia)
+            findNavController().navigate(action)
         }
     }
 

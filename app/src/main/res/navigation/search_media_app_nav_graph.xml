@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/search_media_app_nav_graph"
+    app:startDestination="@id/fragment_search_media">
+
+    <fragment
+        android:id="@+id/fragment_favorite_media"
+        android:name="com.nbw.searchmediaapp.ui.view.FavoriteMediaFragment"
+        android:label="fragment_favorite_media"
+        tools:layout="@layout/fragment_favorite_media" >
+        <action
+            android:id="@+id/action_fragment_favorite_to_media"
+            app:destination="@id/fragment_media"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragment_media"
+        android:name="com.nbw.searchmediaapp.ui.view.MediaFragment"
+        android:label="fragment_media"
+        tools:layout="@layout/fragment_media" >
+        <argument
+            android:name="media"
+            app:argType="com.nbw.searchmediaapp.data.model.Media" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragment_search_media"
+        android:name="com.nbw.searchmediaapp.ui.view.SearchMediaFragment"
+        android:label="fragment_search_media"
+        tools:layout="@layout/fragment_search_media" >
+        <action
+            android:id="@+id/action_fragment_search_to_media"
+            app:destination="@id/fragment_media"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragment_setting"
+        android:name="com.nbw.searchmediaapp.ui.view.SettingFragment"
+        android:label="fragment_setting"
+        tools:layout="@layout/fragment_setting" />
+</navigation>
