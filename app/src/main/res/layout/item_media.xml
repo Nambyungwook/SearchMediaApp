@@ -27,7 +27,7 @@
         tools:text="TITLE"/>
 
     <TextView
-        android:id="@+id/tv_meida_site"
+        android:id="@+id/tv_meida_publisher"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -35,7 +35,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/iv_media_thumbnail"
         app:layout_constraintTop_toBottomOf="@id/tv_media_title"
-        tools:text="SITE"/>
+        tools:text="PUBLISHER"/>
 
     <TextView
         android:id="@+id/tv_datetime"
@@ -45,7 +45,7 @@
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/iv_media_thumbnail"
-        app:layout_constraintTop_toBottomOf="@id/tv_meida_site"
+        app:layout_constraintTop_toBottomOf="@id/tv_meida_publisher"
         tools:text="DATETIME"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

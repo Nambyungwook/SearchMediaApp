@@ -5,22 +5,41 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import com.nbw.searchmediaapp.data.model.Image
+import com.nbw.searchmediaapp.data.model.Media
+import com.nbw.searchmediaapp.data.model.MediaType
 import com.nbw.searchmediaapp.databinding.ItemMediaBinding
 
-class MediaAdapter: ListAdapter<Image, MediaViewHolder>(MediaDiffCallback) {
+class MediaAdapter: ListAdapter<Media, MediaViewHolder>(MediaDiffCallback) {
     companion object {
-        private val MediaDiffCallback = object : DiffUtil.ItemCallback<Image>() {
-            override fun areItemsTheSame(oldItem: Image, newItem: Image): Boolean {
-                return oldItem.imageUrl == newItem.imageUrl
+        private val MediaDiffCallback = object : DiffUtil.ItemCallback<Media>() {
+            override fun areItemsTheSame(oldItem: Media, newItem: Media): Boolean {
+                val oldItemIdentify = if (oldItem.mediaType == MediaType.IMAGE) {
+                    oldItem.image?.imageUrl
+                } else if (oldItem.mediaType == MediaType.VIDEO) {
+                    oldItem.video?.url
+                } else {
+                    ""
+                }
+
+                val newItemIdentify = if (newItem.mediaType == MediaType.IMAGE) {
+                    newItem.image?.imageUrl
+                } else if (newItem.mediaType == MediaType.VIDEO) {
+                    newItem.video?.url
+                } else {
+                    ""
+                }
+
+                return oldItemIdentify == newItemIdentify
             }
 
-            override fun areContentsTheSame(oldItem: Image, newItem: Image): Boolean {
+            override fun areContentsTheSame(oldItem: Media, newItem: Media): Boolean {
                 return oldItem == newItem
             }
 
         }
     }
+
+    private var onItemClickListener: ((Media) -> Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MediaViewHolder {
         return MediaViewHolder(
@@ -31,5 +50,12 @@ class MediaAdapter: ListAdapter<Image, MediaViewHolder>(MediaDiffCallback) {
     override fun onBindViewHolder(holder: MediaViewHolder, position: Int) {
         val media = currentList[position]
         holder.bind(media)
+        holder.itemView.setOnClickListener {
+            onItemClickListener?.let { it(media) }
+        }
+    }
+
+    fun setOnItemClickListener(listener: (Media) -> Unit) {
+        onItemClickListener = listener
     }
 }

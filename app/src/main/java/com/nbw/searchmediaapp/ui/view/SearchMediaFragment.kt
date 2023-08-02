@@ -36,11 +36,11 @@ class SearchMediaFragment : Fragment() {
         mediaViewModel = (activity as MainActivity).mediaViewModel
 
         initRecyclerView()
-//        search()
-        rxSearch()
+        search()
+//        rxSearch()
 
         mediaViewModel.searchMediaResult.observe(viewLifecycleOwner) { result ->
-            val medias = result.images
+            val medias = result
             mediaAdapter.submitList(medias)
         }
 
@@ -75,8 +75,7 @@ class SearchMediaFragment : Fragment() {
                 text?.let {
                     val query = it.toString().trim()
                     if (query.isNotEmpty()) {
-                        mediaViewModel.searchImages(query)
-                        mediaViewModel.rxSearchImages(query)
+                        mediaViewModel.searchMedia(query)
                         mediaViewModel.query = query
                     }
                 }
@@ -98,7 +97,7 @@ class SearchMediaFragment : Fragment() {
                 text?.let {
                     val query = it.toString().trim()
                     if (query.isNotEmpty()) {
-                        mediaViewModel.rxSearchImages(query)
+                        mediaViewModel.rxSearchMedia(query)
                         mediaViewModel.query = query
                     }
                 }
