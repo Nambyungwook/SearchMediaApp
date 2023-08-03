@@ -7,6 +7,7 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.nbw.searchmediaapp.R
+import com.nbw.searchmediaapp.data.db.MediaDatabase
 import com.nbw.searchmediaapp.data.repository.MediaRepositoryImpl
 import com.nbw.searchmediaapp.databinding.ActivityMainBinding
 import com.nbw.searchmediaapp.ui.viewmodel.MediaViewModel
@@ -26,7 +27,8 @@ class MainActivity : AppCompatActivity() {
 
         setupBottomNavigationView()
 
-        val mediaRepository = MediaRepositoryImpl()
+        val database = MediaDatabase.getInstance(this)
+        val mediaRepository = MediaRepositoryImpl(database)
         val viewModelFactory = MediaViewModelProviderFactory(mediaRepository, this)
         mediaViewModel = ViewModelProvider(this, viewModelFactory)[MediaViewModel::class.java]
     }

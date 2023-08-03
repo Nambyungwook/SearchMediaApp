@@ -207,4 +207,15 @@ class MediaViewModel(
     fun clearDisposables() {
         disposables.clear()
     }
+
+    // Room
+    fun insertMedia(media: Media) = viewModelScope.launch(Dispatchers.IO) {
+        mediaRepository.insertMedia(media)
+    }
+
+    fun deleteMedia(media: Media) = viewModelScope.launch(Dispatchers.IO) {
+        mediaRepository.deleteMedia(media)
+    }
+
+    val favoriteMedias: LiveData<List<Media>> = mediaRepository.getFavoriteMedias()
 }

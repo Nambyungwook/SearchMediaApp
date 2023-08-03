@@ -1,15 +1,20 @@
 package com.nbw.searchmediaapp.data.repository
 
+import androidx.lifecycle.LiveData
 import com.nbw.searchmediaapp.data.api.RetrofitInstance.api
 import com.nbw.searchmediaapp.data.api.RetrofitInstance.rxApi
+import com.nbw.searchmediaapp.data.db.MediaDatabase
 import com.nbw.searchmediaapp.data.model.ImagesResponse
+import com.nbw.searchmediaapp.data.model.Media
 import com.nbw.searchmediaapp.data.model.ResultWrapper
 import com.nbw.searchmediaapp.data.model.VideosResponse
 import com.nbw.searchmediaapp.utils.safeApiCall
 import io.reactivex.Observable
 import kotlinx.coroutines.Dispatchers
 
-class MediaRepositoryImpl: MediaRepository {
+class MediaRepositoryImpl(
+    private val db: MediaDatabase
+): MediaRepository {
     override suspend fun searchImages(
         query: String,
         sort: String,
@@ -68,5 +73,18 @@ class MediaRepositoryImpl: MediaRepository {
             page,
             size
         )
+    }
+
+    // Room
+    override suspend fun insertMedia(media: Media) {
+        db.mediaDao().insertMedia(media)
+    }
+
+    override suspend fun deleteMedia(media: Media) {
+        db.mediaDao().deleteMedia(media)
+    }
+
+    override fun getFavoriteMedias(): LiveData<List<Media>> {
+        return db.mediaDao().getFavoriteMedias()
     }
 }

@@ -7,15 +7,18 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
+import com.google.android.material.snackbar.Snackbar
 import com.nbw.searchmediaapp.data.model.MediaType
 import com.nbw.searchmediaapp.databinding.FragmentMediaBinding
+import com.nbw.searchmediaapp.ui.viewmodel.MediaViewModel
 
 class MediaFragment : Fragment() {
 
     private var _binding: FragmentMediaBinding? = null
     private val binding get() = _binding!!
 
-    private val args: MediaFragmentArgs by navArgs<MediaFragmentArgs>()
+    private lateinit var mediaViewModel: MediaViewModel
+    private val args: MediaFragmentArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -27,6 +30,8 @@ class MediaFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        mediaViewModel = (activity as MainActivity).mediaViewModel
 
         val media = args.media
         var mediaImage: String? = null
@@ -64,6 +69,10 @@ class MediaFragment : Fragment() {
             tvMediaDate.text = mediaDate ?: "미디어 날짜를 알 수 없습니다."
             tvMediaInfo.text = mediaInfo ?: "미디어 관련 정보를 알 수 없습니다."
 
+            fabAddFavorite.setOnClickListener {
+                mediaViewModel.insertMedia(media)
+                Snackbar.make(view, "현재 미디어가 즐겨찾기 목록에 저장되었습니다.", Snackbar.LENGTH_SHORT).show()
+            }
         }
     }
 
