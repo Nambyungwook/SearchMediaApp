@@ -1,11 +1,11 @@
 package com.nbw.searchmediaapp.data.repository
 
-import androidx.lifecycle.LiveData
 import com.nbw.searchmediaapp.data.model.ImagesResponse
 import com.nbw.searchmediaapp.data.model.Media
 import com.nbw.searchmediaapp.data.model.ResultWrapper
 import com.nbw.searchmediaapp.data.model.VideosResponse
 import io.reactivex.Observable
+import kotlinx.coroutines.flow.Flow
 
 interface MediaRepository {
     // Remote : API
@@ -44,5 +44,5 @@ interface MediaRepository {
 
     suspend fun deleteMedia(media: Media)
 
-    fun getFavoriteMedias(): LiveData<List<Media>>
+    fun getFavoriteMedias(): Flow<List<Media>>
 }

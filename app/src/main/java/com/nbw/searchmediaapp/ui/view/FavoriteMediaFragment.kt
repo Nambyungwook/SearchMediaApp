@@ -14,6 +14,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.nbw.searchmediaapp.databinding.FragmentFavoriteMediaBinding
 import com.nbw.searchmediaapp.ui.adapter.MediaAdapter
 import com.nbw.searchmediaapp.ui.viewmodel.MediaViewModel
+import com.nbw.searchmediaapp.utils.collectLatestStateFlow
 
 class FavoriteMediaFragment : Fragment() {
 
@@ -39,8 +40,8 @@ class FavoriteMediaFragment : Fragment() {
         initRecyclerView()
         setupTouchHelper(view)
 
-        mediaViewModel.favoriteMedias.observe(viewLifecycleOwner) {medias ->
-            mediaAdapter.submitList(medias)
+        collectLatestStateFlow(mediaViewModel.favoriteMedias) {
+            mediaAdapter.submitList(it)
         }
     }
 

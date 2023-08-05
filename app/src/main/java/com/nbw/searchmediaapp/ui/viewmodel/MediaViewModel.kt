@@ -21,6 +21,9 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import okio.IOException
 import retrofit2.HttpException
@@ -217,5 +220,6 @@ class MediaViewModel(
         mediaRepository.deleteMedia(media)
     }
 
-    val favoriteMedias: LiveData<List<Media>> = mediaRepository.getFavoriteMedias()
+    val favoriteMedias: StateFlow<List<Media>> = mediaRepository.getFavoriteMedias()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), listOf())
 }

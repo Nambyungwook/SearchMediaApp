@@ -1,12 +1,12 @@
 package com.nbw.searchmediaapp.data.db
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.nbw.searchmediaapp.data.model.Media
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface MediaDao {
@@ -18,5 +18,5 @@ interface MediaDao {
     suspend fun deleteMedia(media: Media)
 
     @Query("SELECT * FROM medias")
-    fun getFavoriteMedias(): LiveData<List<Media>>
+    fun getFavoriteMedias(): Flow<List<Media>>
 }

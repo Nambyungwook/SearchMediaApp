@@ -1,6 +1,5 @@
 package com.nbw.searchmediaapp.data.repository
 
-import androidx.lifecycle.LiveData
 import com.nbw.searchmediaapp.data.api.RetrofitInstance.api
 import com.nbw.searchmediaapp.data.api.RetrofitInstance.rxApi
 import com.nbw.searchmediaapp.data.db.MediaDatabase
@@ -11,6 +10,7 @@ import com.nbw.searchmediaapp.data.model.VideosResponse
 import com.nbw.searchmediaapp.utils.safeApiCall
 import io.reactivex.Observable
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 
 class MediaRepositoryImpl(
     private val db: MediaDatabase
@@ -84,7 +84,7 @@ class MediaRepositoryImpl(
         db.mediaDao().deleteMedia(media)
     }
 
-    override fun getFavoriteMedias(): LiveData<List<Media>> {
+    override fun getFavoriteMedias(): Flow<List<Media>> {
         return db.mediaDao().getFavoriteMedias()
     }
 }
