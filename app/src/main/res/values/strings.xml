@@ -3,5 +3,11 @@
 
     <string name="search_media">Search Media</string>
     <string name="favorite_media">Favorite Media</string>
+
+
+    <!-- SettingFragment -->
     <string name="setting">Setting</string>
+    <string name="setting_sort_by_title">검색 정렬 기준</string>
+    <string name="setting_sort_by_accuracy">정확도</string>
+    <string name="setting_sort_by_recency">최신순</string>
 </resources>

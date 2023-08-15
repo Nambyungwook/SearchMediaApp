@@ -45,4 +45,9 @@ interface MediaRepository {
     suspend fun deleteMedia(media: Media)
 
     fun getFavoriteMedias(): Flow<List<Media>>
+
+    // DataStore
+    suspend fun saveSortMode(mode: String)
+
+    suspend fun getSortMode(): Flow<String>
 }

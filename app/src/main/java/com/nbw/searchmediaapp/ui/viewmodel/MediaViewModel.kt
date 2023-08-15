@@ -23,8 +23,10 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okio.IOException
 import retrofit2.HttpException
 
@@ -40,7 +42,7 @@ class MediaViewModel(
     var query = String()
         set(value) {
             field = value
-            savedStateHandle.set(SAVE_STATE_KEY, value)
+            savedStateHandle[SAVE_STATE_KEY] = value
         }
 
     init {
@@ -58,10 +60,10 @@ class MediaViewModel(
 
     fun searchMedia(query: String) = viewModelScope.launch(Dispatchers.IO) {
         val imagesResponse = async {
-            mediaRepository.searchImages(query, "accuracy", 1, 15)
+            mediaRepository.searchImages(query, getSortMode(), 1, 15)
         }
         val videosResponse = async {
-            mediaRepository.searchVideos(query, "accuracy", 1, 15)
+            mediaRepository.searchVideos(query, getSortMode(), 1, 15)
         }
 
         val mediaList = mutableListOf<Media>()
@@ -71,34 +73,40 @@ class MediaViewModel(
         responses.forEach { response ->
             when(response) {
                 is ResultWrapper.Success -> {
-                    if (response.value is ImagesResponse) {
-                        response.value.images?.forEach { image ->
+                    when (response.value) {
+                        is ImagesResponse -> {
+                            response.value.images?.forEach { image ->
+                                mediaList.add(
+                                    Media(
+                                        mediaType = MediaType.IMAGE,
+                                        image = image,
+                                        video = null
+                                    )
+                                )
+                            }
+                        }
+
+                        is VideosResponse -> {
+                            response.value.videos?.forEach { video ->
+                                mediaList.add(
+                                    Media(
+                                        mediaType = MediaType.VIDEO,
+                                        image = null,
+                                        video = video
+                                    )
+                                )
+                            }
+                        }
+
+                        else -> {
                             mediaList.add(
                                 Media(
-                                    mediaType = MediaType.IMAGE,
-                                    image = image,
+                                    mediaType = MediaType.NOTHING,
+                                    image = null,
                                     video = null
                                 )
                             )
                         }
-                    } else if (response.value is VideosResponse) {
-                        response.value.videos?.forEach { video ->
-                            mediaList.add(
-                                Media(
-                                    mediaType = MediaType.VIDEO,
-                                    image = null,
-                                    video = video
-                                )
-                            )
-                        }
-                    } else {
-                        mediaList.add(
-                            Media(
-                                mediaType = MediaType.NOTHING,
-                                image = null,
-                                video = null
-                            )
-                        )
                     }
                     _searchMediaResult.postValue(mediaList)
                 }
@@ -114,52 +122,54 @@ class MediaViewModel(
     }
 
     fun rxSearchMedia(query: String) {
-        val mediaList = mutableListOf<Media>()
-        val imagesObservable = mediaRepository.rxSearchImages(query, "accuracy", 1, 15)
-        val videosObservable = mediaRepository.rxSearchVideos(query, "accuracy", 1, 15)
+        viewModelScope.launch {
+            val mediaList = mutableListOf<Media>()
+            val imagesObservable = mediaRepository.rxSearchImages(query, getSortMode(), 1, 15)
+            val videosObservable = mediaRepository.rxSearchVideos(query, getSortMode(), 1, 15)
 
-        disposables.add(
-            Observable.zip(
-                imagesObservable.subscribeOn(Schedulers.io()),
-                videosObservable.subscribeOn(Schedulers.io())
-            ) { imagesResponse, videosResponse ->
-                imagesResponse.images?.forEach { image ->
-                    mediaList.add(
-                        Media(
-                            mediaType = MediaType.IMAGE,
-                            image = image,
-                            video = null
+            disposables.add(
+                Observable.zip(
+                    imagesObservable.subscribeOn(Schedulers.io()),
+                    videosObservable.subscribeOn(Schedulers.io())
+                ) { imagesResponse, videosResponse ->
+                    imagesResponse.images?.forEach { image ->
+                        mediaList.add(
+                            Media(
+                                mediaType = MediaType.IMAGE,
+                                image = image,
+                                video = null
+                            )
                         )
-                    )
-                }
-
-                videosResponse.videos?.forEach { video ->
-                    mediaList.add(
-                        Media(
-                            mediaType = MediaType.VIDEO,
-                            image = null,
-                            video = video
-                        )
-                    )
-                }
-
-                mediaList
-            }.observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                { result ->
-                    _searchMediaResult.postValue(result)
-                },
-                { throwable ->
-                    val errorResponse = parseErrorResponse(throwable)
-
-                    if (errorResponse.code == null) {
-                        _errorMessage.postValue("error type : ${errorResponse.errorType}  error message : ${errorResponse.errorMessage}")
-                    } else {
-                        _errorMessage.postValue("http code : ${errorResponse.code}  error type : ${errorResponse.errorType}  error message : ${errorResponse.errorMessage}")
                     }
-                }
+
+                    videosResponse.videos?.forEach { video ->
+                        mediaList.add(
+                            Media(
+                                mediaType = MediaType.VIDEO,
+                                image = null,
+                                video = video
+                            )
+                        )
+                    }
+
+                    mediaList
+                }.observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                        { result ->
+                            _searchMediaResult.postValue(result)
+                        },
+                        { throwable ->
+                            val errorResponse = parseErrorResponse(throwable)
+
+                            if (errorResponse.code == null) {
+                                _errorMessage.postValue("error type : ${errorResponse.errorType}  error message : ${errorResponse.errorMessage}")
+                            } else {
+                                _errorMessage.postValue("http code : ${errorResponse.code}  error type : ${errorResponse.errorType}  error message : ${errorResponse.errorMessage}")
+                            }
+                        }
+                    )
             )
-        )
+        }
     }
 
     private fun parseErrorResponse(throwable: Throwable): ResultWrapper.Error {
@@ -222,4 +232,13 @@ class MediaViewModel(
 
     val favoriteMedias: StateFlow<List<Media>> = mediaRepository.getFavoriteMedias()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), listOf())
+
+    // DataStore
+    fun saveSortMode(value: String) = viewModelScope.launch(Dispatchers.IO) {
+        mediaRepository.saveSortMode(value)
+    }
+
+    suspend fun getSortMode() = withContext(Dispatchers.IO) {
+        mediaRepository.getSortMode().first()
+    }
 }

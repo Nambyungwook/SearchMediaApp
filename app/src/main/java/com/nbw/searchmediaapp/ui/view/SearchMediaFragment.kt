@@ -40,8 +40,7 @@ class SearchMediaFragment : Fragment() {
         search()
 //        rxSearch()
 
-        mediaViewModel.searchMediaResult.observe(viewLifecycleOwner) { result ->
-            val medias = result
+        mediaViewModel.searchMediaResult.observe(viewLifecycleOwner) { medias ->
             mediaAdapter.submitList(medias)
         }
 
