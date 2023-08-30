@@ -5,6 +5,7 @@ sealed class ResultWrapper<out T> {
     data class Error(
         val code: Int? = null,
         val errorType: String? = null,
-        val errorMessage: String? = null
+        val errorMessage: String? = null,
+        val error: Throwable? = null
         ): ResultWrapper<Nothing>()
 }

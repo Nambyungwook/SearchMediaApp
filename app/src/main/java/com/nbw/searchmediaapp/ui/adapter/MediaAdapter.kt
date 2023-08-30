@@ -3,13 +3,13 @@ package com.nbw.searchmediaapp.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import com.nbw.searchmediaapp.data.model.Media
 import com.nbw.searchmediaapp.data.model.MediaType
 import com.nbw.searchmediaapp.databinding.ItemMediaBinding
 
-class MediaAdapter: ListAdapter<Media, MediaViewHolder>(MediaDiffCallback) {
+class MediaAdapter: PagingDataAdapter<Media, MediaViewHolder>(MediaDiffCallback) {
     companion object {
         private val MediaDiffCallback = object : DiffUtil.ItemCallback<Media>() {
             override fun areItemsTheSame(oldItem: Media, newItem: Media): Boolean {
@@ -48,10 +48,12 @@ class MediaAdapter: ListAdapter<Media, MediaViewHolder>(MediaDiffCallback) {
     }
 
     override fun onBindViewHolder(holder: MediaViewHolder, position: Int) {
-        val media = currentList[position]
-        holder.bind(media)
-        holder.itemView.setOnClickListener {
-            onItemClickListener?.let { it(media) }
+        val pagedMedia = getItem(position)
+        pagedMedia?.let { media ->
+            holder.bind(media)
+            holder.itemView.setOnClickListener {
+                onItemClickListener?.let { it(media) }
+            }
         }
     }
 

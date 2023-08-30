@@ -15,6 +15,7 @@ import com.nbw.searchmediaapp.databinding.FragmentSearchMediaBinding
 import com.nbw.searchmediaapp.ui.adapter.MediaAdapter
 import com.nbw.searchmediaapp.ui.viewmodel.MediaViewModel
 import com.nbw.searchmediaapp.utils.Constants.SEARCH_TIME_DELAY
+import com.nbw.searchmediaapp.utils.collectLatestStateFlow
 
 class SearchMediaFragment : Fragment() {
 
@@ -38,10 +39,9 @@ class SearchMediaFragment : Fragment() {
 
         initRecyclerView()
         search()
-//        rxSearch()
 
-        mediaViewModel.searchMediaResult.observe(viewLifecycleOwner) { medias ->
-            mediaAdapter.submitList(medias)
+        collectLatestStateFlow(mediaViewModel.searchMediaResult) {
+            mediaAdapter.submitData(it)
         }
 
         mediaViewModel.errorMessage.observe(viewLifecycleOwner) { errorMessage ->
@@ -65,7 +65,6 @@ class SearchMediaFragment : Fragment() {
         }
     }
 
-    // Coroutine을 사용한 검색
     private fun search() {
         val startTime = System.currentTimeMillis()
         var endTime: Long
@@ -87,31 +86,8 @@ class SearchMediaFragment : Fragment() {
         }
     }
 
-    // Rx를 사용한 검색
-    private fun rxSearch() {
-        val startTime = System.currentTimeMillis()
-        var endTime: Long
-
-        binding.etSearch.text =
-            Editable.Factory.getInstance().newEditable(mediaViewModel.query)
-
-        binding.etSearch.addTextChangedListener { text: Editable? ->
-            endTime = System.currentTimeMillis()
-            if (endTime - startTime >= SEARCH_TIME_DELAY) {
-                text?.let {
-                    val query = it.toString().trim()
-                    if (query.isNotEmpty()) {
-                        mediaViewModel.rxSearchMedia(query)
-                        mediaViewModel.query = query
-                    }
-                }
-            }
-        }
-    }
-
     override fun onDestroyView() {
         _binding = null
-        mediaViewModel.clearDisposables()
         super.onDestroyView()
     }
 }

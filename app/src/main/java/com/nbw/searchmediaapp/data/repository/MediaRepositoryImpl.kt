@@ -5,18 +5,14 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.nbw.searchmediaapp.data.api.RetrofitInstance.api
-import com.nbw.searchmediaapp.data.api.RetrofitInstance.rxApi
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.nbw.searchmediaapp.data.db.MediaDatabase
-import com.nbw.searchmediaapp.data.model.ImagesResponse
 import com.nbw.searchmediaapp.data.model.Media
-import com.nbw.searchmediaapp.data.model.ResultWrapper
-import com.nbw.searchmediaapp.data.model.VideosResponse
 import com.nbw.searchmediaapp.data.repository.MediaRepositoryImpl.PreferencesKeys.SORT_MODE
+import com.nbw.searchmediaapp.utils.Constants.PAGING_SIZE
 import com.nbw.searchmediaapp.utils.Sort
-import com.nbw.searchmediaapp.utils.safeApiCall
-import io.reactivex.Observable
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -26,64 +22,20 @@ class MediaRepositoryImpl(
     private val db: MediaDatabase,
     private val dataStore: DataStore<Preferences>
 ): MediaRepository {
-    override suspend fun searchImages(
+    override suspend fun searchMedias(
         query: String,
-        sort: String,
-        page: Int,
-        size: Int
-    ): ResultWrapper<ImagesResponse> {
-        return safeApiCall(Dispatchers.IO) {
-            api.searchImages(
-                query,
-                sort,
-                page,
-                size
-            )
-        }
-    }
+        sort: String
+    ): Flow<PagingData<Media>> {
+        val pagingSourceFactory = { MediaPagingSource(query, sort) }
 
-    override suspend fun searchVideos(
-        query: String,
-        sort: String,
-        page: Int,
-        size: Int
-    ): ResultWrapper<VideosResponse> {
-        return safeApiCall(Dispatchers.IO) {
-            api.searchVideos(
-                query,
-                sort,
-                page,
-                size
-            )
-        }
-    }
-
-    override fun rxSearchImages(
-        query: String,
-        sort: String,
-        page: Int,
-        size: Int
-    ): Observable<ImagesResponse> {
-        return rxApi.rxSearchImages(
-            query,
-            sort,
-            page,
-            size
-        )
-    }
-
-    override fun rxSearchVideos(
-        query: String,
-        sort: String,
-        page: Int,
-        size: Int
-    ): Observable<VideosResponse> {
-        return rxApi.rxSearchVideos(
-            query,
-            sort,
-            page,
-            size
-        )
+        return Pager(
+                config = PagingConfig(
+                    pageSize = PAGING_SIZE,
+                    enablePlaceholders = false,
+                    maxSize = PAGING_SIZE * 3
+                ),
+                pagingSourceFactory = pagingSourceFactory
+            ).flow
     }
 
     // Room
@@ -95,8 +47,17 @@ class MediaRepositoryImpl(
         db.mediaDao().deleteMedia(media)
     }
 
-    override fun getFavoriteMedias(): Flow<List<Media>> {
-        return db.mediaDao().getFavoriteMedias()
+    override fun getFavoriteMedias(): Flow<PagingData<Media>> {
+        val pagingSourceFactory = { db.mediaDao().getFavoriteMedias() }
+
+        return Pager(
+            config = PagingConfig(
+                pageSize = PAGING_SIZE,
+                enablePlaceholders = false,
+                maxSize = PAGING_SIZE * 3
+            ),
+            pagingSourceFactory = pagingSourceFactory
+        ).flow
     }
 
     // DataStore

@@ -41,7 +41,7 @@ class FavoriteMediaFragment : Fragment() {
         setupTouchHelper(view)
 
         collectLatestStateFlow(mediaViewModel.favoriteMedias) {
-            mediaAdapter.submitList(it)
+            mediaAdapter.submitData(it)
         }
     }
 
@@ -78,14 +78,16 @@ class FavoriteMediaFragment : Fragment() {
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val position = viewHolder.adapterPosition
-                val media = mediaAdapter.currentList[position]
-                mediaViewModel.deleteMedia(media)
-                Snackbar.make(view, "현재 미디어를 즐겨찾기에서 삭제했습니다.", Snackbar.LENGTH_SHORT).apply {
-                    setAction("Undo") {
-                        mediaViewModel.insertMedia(media)
-                    }
-                }.show()
+                val position = viewHolder.bindingAdapterPosition
+                val pagedMedia = mediaAdapter.peek(position)
+                pagedMedia?.let { media ->
+                    mediaViewModel.deleteMedia(media)
+                    Snackbar.make(view, "현재 미디어를 즐겨찾기에서 삭제했습니다.", Snackbar.LENGTH_SHORT).apply {
+                        setAction("Undo") {
+                            mediaViewModel.insertMedia(media)
+                        }
+                    }.show()
+                }
             }
         }
         ItemTouchHelper(itemTouchHelperCallback).apply {
